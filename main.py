@@ -14,7 +14,9 @@ dpDB = input('Do you want to install test Database? (y/n)')
 
 uName = input('Enter Username-->')
 uPass = input('Enter Password-->')
-print('\b')
+a = ' ' * (len(uPass) + 17)
+print("\033[F" + a, end="", flush=True)
+
 
 
 
