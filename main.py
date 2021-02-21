@@ -1,18 +1,18 @@
-'''RetailManagementSystem
+"""RetailManagementSystem
 this would used in grocery stores and small business owners who want to manage following
 *inventory
 *sales
 *dealers
-*customers '''
+*customers
 
-''' this is the main file used to operate multiple functionalities '''
+this is the main file used to operate multiple functionalities """
 
 import mod.dumpDB
 import mysql.connector
 
 
 def sqlLogin():
-    # Login Procedure
+    """ Login Procedure """
     global uName
     global uPass
     uName = input('Enter Username-->')
@@ -40,3 +40,4 @@ if SQLconnector.is_connected():
     print('connected')
 else:
     print('Error in connecting. Please try again.')
+    sqlLogin()
