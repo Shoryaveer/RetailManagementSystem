@@ -50,13 +50,29 @@ def initaliseDB(sqlCursor, dbName):
     # Creating coupons table
     sqlCursor.execute(" \
         CREATE TABLE coupons( \
-        co_id CHAR(8), \
+        co_id CHAR(8) PRIMARY KEY, \
         expire_date DATE, \
         min_prod INT, \
         percentage INT \
         )")
 
     # Creating stock transactions
+    sqlCursor.execute(" \
+        CREATE TABLE stocktransac( \
+        d_id CHAR(3), \
+        st_id CHAR(4) PRIMARY KEY, \
+        transac_date DATETIME DEFAULT CURRENT_TIMESTAMP \
+        ")
+
+    # Creating transaction details
+    sqlCursor.execute("\
+        CREATE TABLE stocktransac2( \
+        p_id CHAR(4), \
+        p_cp FLOAT, \
+        st_id CHAR(4), \
+        quantity INT, \
+        exp_date DATE, \
+        ")
 
 
 def jamData(sqlConnector, dbName):
@@ -65,7 +81,7 @@ def jamData(sqlConnector, dbName):
     sqlCursor = sqlConnector.cursor()
     sqlCursor.execute(f'USE {dbName};')  # Selecting Database
 
-# Dumping data in c_data
+    # Dumping data in c_data
     insC_Data = open(r'.\obj\C_DATA.bin', 'r', newline='\n')  # Relative path opening to data file
     c_dataReader = csv.reader(insC_Data, delimiter='\t')  # Creating CSV object to iter through stored data
     insC_Data.seek(0)  # Moving cursor to the start of file
