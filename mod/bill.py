@@ -2,6 +2,7 @@
 import random
 import pickle
 import os
+# move bin to database folder
 
 
 def createBill(sqlConnector):
@@ -10,6 +11,7 @@ def createBill(sqlConnector):
     sqlCursor = sqlConnector.cursor()
 
     productQueue = getProductQueue(sqlCursor)
+    # productQueue = {'c_id': '', 's_id': '', 'co': percentage, 'p_id': [p_quantity, p_price, p_name]...}
 
     # Attaining other information
     sqlCursor.execute('SELECT c_id FROM c_data')
@@ -47,13 +49,28 @@ def createBill(sqlConnector):
     # Adding s_id, c_id to productQueue
     productQueue['s_id'] = s_id
 
+    # Adding coupons to bill
+    sqlCursor.execute(f"SELECT percentage FROM coupons \
+        WHERE expire_date>CURDATE() AND min_prod<={len(productQueue) - 2}")
+    retrieveSet = sqlCursor.fetchall()
+    if retrieveSet:
+        coCheck = input('Coupon available do you want to apply coupon(y/n)-->')
+        if coCheck.lower() == 'y':
+            productQueue['co'] = max(retrieveSet[0])
+        else:
+            print('No coupons added.')
+            productQueue['co'] = 0
+    else:
+        print('No coupons available.')
+        productQueue['co'] = 0
+
     # Storing Bill in file and making entry in DB
     billOut = open(r'.\obj\bill.obj', 'ab+')
     pickle.dump(productQueue, billOut)
     sqlCursor.execute(f"INSERT INTO sales(c_id, s_id) VALUES('{productQueue['c_id']}', '{s_id}')")
     sqlConnector.commit()
 
-    # Closing  open files
+    # Closing open files
     billOut.close()
 
     # Bill summary
@@ -68,6 +85,12 @@ def createBill(sqlConnector):
     else:
         print('\nWrong input. Bill will be saved.')
 
+    # Reducing stock quantities
+    for p_id in productQueue:
+        if p_id != 'c_id' and p_id != 's_id' and p_id != 'co':
+            sqlCursor.execute(f"UPDATE stock SET p_quantity = p_quantity - {productQueue[p_id][0]} WHERE p_id = {p_id}")
+            sqlConnector.commit()
+
 
 def viewBill(s_id, showID='n'):
     """ This will show the bill for the required sales ID. """
@@ -80,20 +103,33 @@ def viewBill(s_id, showID='n'):
     print('\nSales ID : ', s_id, '\nCustomer ID : ', productQueue['c_id'])
 
     totalPrice = 0
+    n = 0
     for productKeys in productQueue.keys():
-        if productKeys != 's_id' and productKeys != 'c_id':
+        if productKeys != 's_id' and productKeys != 'c_id' and productKeys != 'co':
             p_quantity, p_price, p_name = productQueue[productKeys]
-            if showID == 'y':
-                print('Product ID    ', 'Product Name'.ljust(33), 'Product Quantity   ', 'Total Price', sep='')
-                print(productKeys.rjust(10) + '    ', p_name.ljust(33), str(p_quantity).ljust(19), p_quantity * p_price, sep='')
+            if n == 0:
+                if showID == 'y':
+                    print('Product ID    ', 'Product Name'.ljust(33), 'Product Quantity   ', 'Total Price', sep='')
+                    print(productKeys.rjust(10) + '    ', p_name.ljust(33), str(p_quantity).ljust(19), p_quantity * p_price, sep='')
+                    n = 1
+                else:
+                    print('Product Name'.ljust(33), 'Product Quantity   ', 'Total Price', sep='')
+                    print(p_name.ljust(33), str(p_quantity).ljust(19), p_quantity * p_price, sep='')
+                    n = 1
             else:
-                print('Product Name'.ljust(33), 'Product Quantity   ', 'Total Price', sep='')
-                print(p_name.ljust(33), str(p_quantity).ljust(19), p_quantity * p_price, sep='')
+                if showID == 'y':
+                    print(productKeys.rjust(10) + '    ', p_name.ljust(33), str(p_quantity).ljust(19), p_quantity * p_price, sep='')
+                else:
+                    print(p_name.ljust(33), str(p_quantity).ljust(19), p_quantity * p_price, sep='')
+            totalPrice += p_quantity * p_price
+
+    if productQueue['co']:
+        totalPrice -= totalPrice * (productQueue['co'] * 0.01)
     if showID == 'y':
-        totalPrice += p_quantity * p_price
+        print('Coupon Less : '.rjust(66), productQueue['co'], sep='')
         print('Grand Total : '.rjust(66), totalPrice, sep='')
     else:
-        totalPrice += p_quantity * p_price
+        print('Coupon Less : '.rjust(52), productQueue['co'], sep='')
         print('Grand Total : '.rjust(52), totalPrice, sep='')
 
 
@@ -247,7 +283,6 @@ def getProductQueue(sqlCursor):
             if quantityInput > idArray[idInput][0]:
                 print('Entered Quantity exceeds available stock.')
                 continue
-
         except ValueError:
             print('Wrong char type entered.')
             continue

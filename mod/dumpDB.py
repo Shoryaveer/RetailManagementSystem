@@ -62,7 +62,7 @@ def initaliseDB(sqlCursor, dbName):
         d_id CHAR(3), \
         st_id CHAR(4) PRIMARY KEY, \
         transac_date DATETIME DEFAULT CURRENT_TIMESTAMP \
-        ")
+        )")
 
     # Creating transaction details
     sqlCursor.execute("\
@@ -71,8 +71,8 @@ def initaliseDB(sqlCursor, dbName):
         p_cp FLOAT, \
         st_id CHAR(4), \
         quantity INT, \
-        exp_date DATE, \
-        ")
+        exp_date DATE \
+        )")
 
 
 def jamData(sqlConnector, dbName):
@@ -81,9 +81,10 @@ def jamData(sqlConnector, dbName):
     sqlCursor = sqlConnector.cursor()
     sqlCursor.execute(f'USE {dbName};')  # Selecting Database
 
+    ##
     # Dumping data in c_data
-    insC_Data = open(r'.\obj\C_DATA.bin', 'r', newline='\n')  # Relative path opening to data file
-    c_dataReader = csv.reader(insC_Data, delimiter='\t')  # Creating CSV object to iter through stored data
+    insC_Data = open(r'.\database\C_DATA.bin', 'r', newline='\n')  # Relative path opening to data file
+    c_dataReader = csv.reader(insC_Data, delimiter='\t')  # Creating CSV databaseect to iter through stored data
     insC_Data.seek(0)  # Moving cursor to the start of file
 
     for ins in c_dataReader:
@@ -92,13 +93,13 @@ def jamData(sqlConnector, dbName):
         VALUES('{ins[0]}', '{ins[1]}', '{ins[2]}', '{ins[3]}') \
         ")
         sqlConnector.commit()
-        insC_Data.close()
+    insC_Data.close()
 
     ##
     # Dumping data in dealer_data
-    insDealer_Data = open(r'.\obj\DEALER_DATA.bin', 'r', newline='\n')  # Relative path opening to data file
-    dealer_dataReader = csv.reader(insDealer_Data, delimiter='\t')  # Creating CSV object to iter through stored data
-    insDealer_Data.seek(0)  # Moving cursor to the start of file
+    insDealer_Data = open(r'.\database\DEALER_DATA.bin', 'r', newline='\n')
+    dealer_dataReader = csv.reader(insDealer_Data, delimiter='\t')
+    insDealer_Data.seek(0)
 
     for ins in dealer_dataReader:
         sqlCursor.execute(f" \
@@ -106,13 +107,13 @@ def jamData(sqlConnector, dbName):
         VALUES('{ins[0]}', '{ins[1]}', '{ins[2]}', '{ins[3]}') \
         ")
         sqlConnector.commit()
-        insDealer_Data.close()
+    insDealer_Data.close()
 
     ##
     # Dumping data in coupons
-    insCoupons = open(r'.\obj\COUPONS.bin', 'r', newline='\n')  # Relative path opening to data file
-    couponsReader = csv.reader(insCoupons, delimiter='\t')  # Creating CSV object to iter through stored data
-    insCoupons.seek(0)  # Moving cursor to the start of file
+    insCoupons = open(r'.\database\COUPONS.bin', 'r', newline='\n')
+    couponsReader = csv.reader(insCoupons, delimiter='\t')
+    insCoupons.seek(0)
 
     for ins in couponsReader:
         sqlCursor.execute(f" \
@@ -120,13 +121,13 @@ def jamData(sqlConnector, dbName):
         VALUES('{ins[0]}', '{ins[1]}', {ins[2]}, {ins[3]}) \
         ")
         sqlConnector.commit()
-        insCoupons.close()
+    insCoupons.close()
 
     ##
     # Dumping data in stock
-    insStock = open(r'.\obj\STOCK.bin', 'r', newline='\n')  # Relative path opening to data file
-    stockReader = csv.reader(insStock, delimiter='\t')  # Creating CSV object to iter through stored data
-    insStock.seek(0)  # Moving cursor to the start of file
+    insStock = open(r'.\database\STOCK.bin', 'r', newline='\n')
+    stockReader = csv.reader(insStock, delimiter='\t')
+    insStock.seek(0)
 
     for ins in stockReader:
         sqlCursor.execute(f" \
@@ -134,10 +135,46 @@ def jamData(sqlConnector, dbName):
         VALUES('{ins[0]}', '{ins[1]}', '{ins[2]}', {ins[3]}, {ins[4]}, '{ins[5]}') \
         ")
         sqlConnector.commit()
-        insStock.close()
+    insStock.close()
 
     ##
     # Dumping data in sales
+    insSales = open(r'.\database\SALES.bin', 'r', newline='\n')
+    salesReader = csv.reader(insSales, delimiter='\t')
+    insSales.seek(0)
+
+    for ins in salesReader:
+        sqlCursor.execute(f" \
+        INSERT INTO sales(s_id, c_id, issued_on) \
+        VALUES('{ins[0]}', '{ins[1]}', '{ins[2]}') \
+        ")
+        sqlConnector.commit()
+    insSales.close()
 
     ##
-    # Dumping data in stock transc
+    # Dumping data in stock transaction
+    insStockTran = open(r'.\database\STOCKTRAN.bin', 'r', newline='\n')
+    stockTranReader = csv.reader(insStockTran, delimiter='\t')
+    insStockTran.seek(0)
+
+    for ins in stockTranReader:
+        sqlCursor.execute(f" \
+        INSERT INTO stocktransac(d_id, st_id, transac_date) \
+        VALUES('{ins[0]}', '{ins[1]}', '{ins[2]}') \
+        ")
+        sqlConnector.commit()
+    insStock.close()
+
+    ##
+    # Dumping data in transaction details
+    insStockTran2 = open(r'.\database\STOCKTRAN2.bin', 'r', newline='\n')
+    stockTran2Reader = csv.reader(insStockTran2, delimiter='\t')
+    insStockTran2.seek(0)
+
+    for ins in stockTran2Reader:
+        sqlCursor.execute(f" \
+        INSERT INTO stocktransac2(p_id, p_cp, st_id, quantity, exp_date) \
+        VALUES('{ins[0]}', {ins[1]}, '{ins[2]}', {ins[3]}, '{ins[4]}') \
+        ")
+        sqlConnector.commit()
+    insStockTran2.close()

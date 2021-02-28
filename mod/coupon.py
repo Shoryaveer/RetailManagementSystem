@@ -52,6 +52,6 @@ def viewCoupon(sqlConnector):
     cursor = sqlConnector.cursor()
     cursor.execute("select * from coupons")
     retrieveSet = cursor.fetchall()
-    print('Coupon ID', 'Expire Date', 'Minimum Product', 'Percentage', sep='')  # Displaying hedings
+    print('Coupon ID', 'Expire Date', 'Minimum Product', 'Percentage')  # Displaying hedings
     for co_id, expire_date, min_prod, percentage in retrieveSet:
-        print(co_id.ljust(10), expire_date, str(min_prod).ljust(15), str(percentage), sep='')  # displaying the ID Names and Quantities
+        print(co_id.ljust(10), expire_date, '  ', str(min_prod).ljust(16), str(percentage), sep='')  # displaying the ID Names and Quantities

@@ -20,7 +20,7 @@ import mod.bill as bill
 import mysql.connector
 
 
-def sqlLogin(dbName):
+def sqlLogin(dbName=''):
     """ Login Procedure """
     global uName
     global uPass
@@ -29,8 +29,15 @@ def sqlLogin(dbName):
         uPass = input('Enter Password-->')
         a = ' ' * (len(uPass) + 17) + '\n'  # count number of char. in pass
         print("\033[F" + a, end="", flush=True)  # \033[F is ANSI to the cursor one line up and added spaces to remove password
+        try:
+            if dbName:
+                sqlConnector = mysql.connector.connect(host='localhost', username=uName, password=uPass, database=dbName)
+            else:
+                sqlConnector = mysql.connector.connect(host='localhost', username=uName, password=uPass)
+        except Exception:
+            print('Wrong Ussername or Password. Try again\n')
+            continue
 
-        sqlConnector = mysql.connector.connect(host='localhost', username=uName, password=uPass, database=dbName)
         if sqlConnector.is_connected():
             print('connected')
             return sqlConnector
@@ -44,9 +51,9 @@ dpDB = input('Do you want to install test Database? (y/n)')
 
 if dpDB.lower() == 'y':
     dbName = 'Retail_test_db'
-    sqlConnector = sqlLogin(dbName)  # function call to mysql login
+    sqlConnector = sqlLogin()
     sqlCursor = sqlConnector.cursor()
-    dumpDB.initialiseDB(sqlCursor, dbName)
+    dumpDB.initaliseDB(sqlCursor, dbName)
     dumpDB.jamData(sqlConnector, dbName)
 
 elif dpDB.lower() == 'n':
