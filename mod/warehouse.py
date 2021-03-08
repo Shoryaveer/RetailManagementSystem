@@ -20,8 +20,8 @@ def newProduct(sqlConnector):
         else:
             break
 
-    query = f"INSERT INTO stock(p_id,p_name,p_quantity,d_id,p_price,p_expiry) VALUES\
-        ('{prod_id}', '{prod_name}', {prod_quantity}, '{dealer_id}', {prod_price}, {prod_expiry})"
+    query = f"INSERT INTO stock(p_id,p_name,p_quantity,d_id,p_price,p_expire) VALUES\
+        ('{prod_id}', '{prod_name}', {prod_quantity}, '{dealer_id}', {prod_price}, '{prod_expiry}')"
     cursor.execute(query)
     sqlConnector.commit()
 
