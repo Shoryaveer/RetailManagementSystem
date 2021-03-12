@@ -126,10 +126,10 @@ def viewBill(s_id, showID='n'):
     if productQueue['co']:
         totalPrice -= totalPrice * (productQueue['co'] * 0.01)
     if showID == 'y':
-        print('Coupon Less : '.rjust(66), productQueue['co'], sep='')
+        print('Coupon Less : '.rjust(66), productQueue['co'], '%', sep='')
         print('Grand Total : '.rjust(66), totalPrice, sep='')
     else:
-        print('Coupon Less : '.rjust(52), productQueue['co'], sep='')
+        print('Coupon Less : '.rjust(52), productQueue['co'], '%', sep='')
         print('Grand Total : '.rjust(52), totalPrice, sep='')
 
 

@@ -7,9 +7,11 @@ this would used in grocery stores and small business owners who want to manage f
 *customers
 
 this is the main file used to operate multiple functionalities
+
+*** All name and details were generated online ***
 """
 
-import mod.warehouse as wharehouse
+import mod.warehouse as warehouse
 import mod.transaction as transaction
 import mod.customer as customer
 import mod.dumpDB as dumpDB
@@ -98,12 +100,12 @@ while True:
     elif selection == '5':
         transaction.viewTransaction(sqlCursor)
     elif selection == '6':
-        wharehouse.newProduct(sqlConnector)
+        warehouse.newProduct(sqlConnector)
     elif selection == '7':
-        wharehouse.editProduct(sqlConnector)
+        warehouse.editProduct(sqlConnector)
     elif selection == '8':
         p_id = input('Enter Product ID-->')
-        wharehouse.viewProduct(sqlConnector, p_id)
+        warehouse.viewProduct(sqlConnector, p_id)
     elif selection == '9':
         customer.newCustomer(sqlConnector)
     elif selection == '10':
